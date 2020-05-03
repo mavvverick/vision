@@ -17,8 +17,8 @@ _LABEL_MAP = {0: 'likee', 1: 'nuetral', 2: 'tiktok'}
 
 def load_image(folder_path):
     try:
-        files = [f for f in glob.glob(
-            folder_path + "**/*.jpg", recursive=True)]
+        files = [f for f in sorted(glob.glob(
+            folder_path + "/**/*.jpg", recursive=True))[:3]]
     except Exception as e:
         print(e)
 

@@ -6,6 +6,7 @@ import logo
 import dense_pb2
 import dense_pb2_grpc
 import time
+import asyncio
 
 
 # python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. dense.proto

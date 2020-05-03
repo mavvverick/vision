@@ -51,10 +51,32 @@ def predict(images_data_list):
     else:
         return data
 
+def download_unzip(download_path, gcs_object_path):
+    try:
+        from google.cloud import storage
+        import tarfile
+        storage_client = storage.Client.from_service_account_json(
+            '/Users/arpit/Desktop/dev-gcs.json')
+        
+        bucket_name = settings.
+        object_path = gcs_object_path+"/raw/1.tar.gz"
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(object_path)
 
-async def http(post_id):
+        localpath = settings.FOLDER_PATH + "1.tar.gz"
+        blob.download_to_filename(localpath)
+
+        # unzip process
+        tar = tarfile.open(localpath, "r:gz")
+        tar.extractall(path=download_path)
+        tar.close()
+    except Exception as e:
+        print(e)
+
+def http(post_id):
     folder_path = settings.FOLDER_PATH + post_id
     # async download and unzip frames pending
-    images_data_list = load_image(folder_path)
+    download_unzip(folder_path, post_id)
+    images_data_list = load_image(settings.FOLDER_PATH)
     result = predict(images_data_list)
     return result
