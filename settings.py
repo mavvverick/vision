@@ -10,3 +10,4 @@ if not os.getenv("ML_HOST"):
 HOST = os.getenv("ML_HOST")
 FOLDER_PATH = os.getenv("FOLDER_PATH")
 BUCKET_NAME = os.getenv("BUCKET_NAME")
+CRED_JSON = os.getenv("CRED_JSON")

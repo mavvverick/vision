@@ -14,7 +14,7 @@ _LABEL_MAP = {0: 'drawings', 1: 'hentai', 2: 'neutral', 3: 'porn', 4: 'sexy'}
 
 
 def load_image(folder_path):
-    files = [f for f in glob.glob(folder_path + "**/*.jpg", recursive=True)]
+    files = [f for f in glob.glob(folder_path + "/**/*.jpg", recursive=True)]
     input_list = []
 
     for image_path in files:
@@ -51,14 +51,14 @@ def predict(images_data_list):
     else:
         return data
 
-def download_unzip(download_path, gcs_object_path):
+async def download_unzip(download_path, gcs_object_path):
     try:
         from google.cloud import storage
         import tarfile
         storage_client = storage.Client.from_service_account_json(
-            '/Users/arpit/Desktop/dev-gcs.json')
-        
-        bucket_name = settings.
+            settings.CRED_JSON)
+
+        bucket_name = settings.BUCKET_NAME
         object_path = gcs_object_path+"/raw/1.tar.gz"
         bucket = storage_client.bucket(bucket_name)
         blob = bucket.blob(object_path)
@@ -73,10 +73,10 @@ def download_unzip(download_path, gcs_object_path):
     except Exception as e:
         print(e)
 
-def http(post_id):
+async def http(post_id):
     folder_path = settings.FOLDER_PATH + post_id
     # async download and unzip frames pending
-    download_unzip(folder_path, post_id)
+    await download_unzip(folder_path, post_id)
     images_data_list = load_image(settings.FOLDER_PATH)
-    result = predict(images_data_list)
-    return result
+    # result = predict(images_data_list)
+    return images_data_list

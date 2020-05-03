@@ -12,8 +12,11 @@ import asyncio
 # python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. dense.proto
 class DenseServicer(dense_pb2_grpc.PredictServicer):
     def predict_nsfw(self, request, context):
-        response = nsfw.http(request.postId)
-        print(response)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(nsfw.http(request.postId))
+        # response = nsfw.http(request.postId)
+        # print(response)
         return dense_pb2.Response(message="OK")
 
     def predict_logo(self, request, context):
