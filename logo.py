@@ -11,8 +11,8 @@ _IMAGE_SIZE_WIDTH = 180
 _IMAGE_SIZE_HEIGHT = 75
 _STD = 255
 
-SERVER_URL = settings.HOST + '/v1/models/logo:predict'
-_LABEL_MAP = {0: 'likee', 1: 'nuetral', 2: 'tiktok'}
+SERVER_URL = 'http://localhost:8501/v1/models/logo:predict'
+_LABEL_MAP = {0: 'likee', 1: 'neutral', 2: 'tiktok'}
 
 
 def load_image(folder_path):
@@ -21,7 +21,6 @@ def load_image(folder_path):
             folder_path + "/**/*.jpg", recursive=True))[:3]]
     except Exception as e:
         print(e)
-
     input_list = []
     for image_path in files:
         img = Image.open(image_path)
