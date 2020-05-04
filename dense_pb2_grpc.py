@@ -23,6 +23,11 @@ class PredictStub(object):
                 request_serializer=dense__pb2.ImageData.SerializeToString,
                 response_deserializer=dense__pb2.Response.FromString,
                 )
+        self.predict_pipeline = channel.unary_unary(
+                '/dense.Predict/predict_pipeline',
+                request_serializer=dense__pb2.ImageData.SerializeToString,
+                response_deserializer=dense__pb2.Response.FromString,
+                )
 
 
 class PredictServicer(object):
@@ -40,6 +45,12 @@ class PredictServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def predict_pipeline(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_PredictServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -50,6 +61,11 @@ def add_PredictServicer_to_server(servicer, server):
             ),
             'predict_logo': grpc.unary_unary_rpc_method_handler(
                     servicer.predict_logo,
+                    request_deserializer=dense__pb2.ImageData.FromString,
+                    response_serializer=dense__pb2.Response.SerializeToString,
+            ),
+            'predict_pipeline': grpc.unary_unary_rpc_method_handler(
+                    servicer.predict_pipeline,
                     request_deserializer=dense__pb2.ImageData.FromString,
                     response_serializer=dense__pb2.Response.SerializeToString,
             ),
@@ -90,6 +106,22 @@ class Predict(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/dense.Predict/predict_logo',
+            dense__pb2.ImageData.SerializeToString,
+            dense__pb2.Response.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def predict_pipeline(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/dense.Predict/predict_pipeline',
             dense__pb2.ImageData.SerializeToString,
             dense__pb2.Response.FromString,
             options, channel_credentials,

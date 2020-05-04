@@ -61,7 +61,7 @@ def predict(images_data_list):
         return data
 
 
-def http(post_id):
+async def http(post_id):
     # pick selected images
     folder_path = settings.FOLDER_PATH + post_id
     images_data_list = load_image(folder_path)
