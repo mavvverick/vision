@@ -11,7 +11,7 @@ _IMAGE_SIZE_WIDTH = 180
 _IMAGE_SIZE_HEIGHT = 75
 _STD = 255
 
-SERVER_URL = 'http://localhost:8501/v1/models/logo:predict'
+SERVER_URL = settings.HOST + '/v1/models/logo:predict'
 _LABEL_MAP = {0: 'likee', 1: 'neutral', 2: 'tiktok'}
 
 

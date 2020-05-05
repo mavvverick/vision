@@ -9,7 +9,7 @@ import settings
 from tensor_utils import img_to_array
 
 _IMAGE_SIZE = 299
-SERVER_URL = 'http://localhost:8501/v1/models/nsfw:predict'
+SERVER_URL = settings.HOST + '/v1/models/nsfw:predict'
 _LABEL_MAP = {0: 'drawings', 1: 'hentai', 2: 'neutral', 3: 'porn', 4: 'sexy'}
 
 
