@@ -8,7 +8,7 @@ import dense_pb2_grpc
 import time
 import asyncio
 from threading import current_thread
-from common import download_unzip, get_max_from_list_of_dict
+from common import download_unzip, get_max_from_list_of_dict, GCSClient
 import settings
 import json
 
@@ -17,38 +17,39 @@ import json
 
 
 class DenseServicer(dense_pb2_grpc.PredictServicer):
+
+    def __init__(self):
+        self.gcs_client = GCSClient.Instance().storage_client
+
     def predict_nsfw(self, request, context):
         post_id = request.postId
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        result = loop.run_until_complete(nsfw.http(post_id))
+        try:
+            res = asyncio.run(nsfw.http(post_id))
+            print(res)
+        except Exception as e:
+            print(e)
         print_thread(post_id)
-        loop.close()
         return dense_pb2.Response(message="OK")
 
     def predict_logo(self, request, context):
-        response = logo.http(request.postId)
-        print(response)
+        try:
+            response = asyncio.run(logo.http(request.post_id))
+            print(response)
+        except Exception as e:
+            print(e)
         return dense_pb2.Response(message="OK")
 
     def predict_pipeline(self, request, context):
         post_id = request.postId
         folder_path = settings.FOLDER_PATH + post_id
         try:
-            download_unzip(folder_path, post_id)
+            asyncio.run(download_unzip(self.gcs_client, folder_path, post_id))
+            proxy = asyncio.run(task_manager(post_id))
+            res = json.dumps(proxy, ensure_ascii=False).encode('utf-8')
+            # TODO catch all err and return dense_pb2.Response(message="error message", error="error")
+            return dense_pb2.Response(message=res, isNext=True)
         except Exception as e:
             print(e)
-        try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            proxy = loop.run_until_complete(task_manager(post_id))
-            loop.close()
-        except Exception as e:
-            print(e)
-        print_thread(post_id)
-        res = json.dumps(proxy, ensure_ascii=False).encode('utf-8')
-        # TODO catch all err and return dense_pb2.Response(message="error message", error="error")
-        return dense_pb2.Response(message=res, isNext=True)
 
 
 def print_thread(post_id):

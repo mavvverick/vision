@@ -1,24 +1,51 @@
 import settings
+from google.cloud import storage
+import tarfile
+import tempfile
 
 # create singleton
-def download_unzip(download_path, gcs_object_path):
+# ref -> https://medium.com/better-programming/singleton-in-python-5eaa66618e3d
+class Singleton:
+
+    def __init__(self, cls):
+        self._cls = cls
+
+    def Instance(self):
+        try:
+            return self._instance
+        except AttributeError:
+            self._instance = self._cls()
+            return self._instance
+
+    def __call__(self):
+        raise TypeError('Singletons must be accessed through `Instance()`.')
+
+    def __instancecheck__(self, inst):
+        return isinstance(inst, self._cls)
+
+@Singleton
+class GCSClient(object):
+
+    def __init__(self):
+        try:
+            with tempfile.NamedTemporaryFile() as temp:
+                temp.write(bytes(settings.CRED_JSON, 'utf-8'))
+                temp.flush()
+                self.storage_client = storage.Client.from_service_account_json(temp.name)
+        except Exception as e:
+            print(e)
+    
+    def __repr__(self):
+        return self.storage_client.__repr__()
+
+async def download_unzip(client, download_path, gcs_object_path):
     try:
-        from google.cloud import storage
-        import tarfile
-        import tempfile
-
-        with tempfile.NamedTemporaryFile() as temp:
-            temp.write(bytes(settings.CRED_JSON, 'utf-8'))
-            temp.flush()
-            storage_client = storage.Client.from_service_account_json(
-                temp.name)
-
         bucket_name = settings.BUCKET_NAME
         object_path = gcs_object_path+"/raw/1.tar.gz" # need to update the gcs object path (refer from input url)
-        bucket = storage_client.bucket(bucket_name)
+        bucket = client.bucket(bucket_name)
         blob = bucket.blob(object_path)
 
-        localpath = settings.FOLDER_PATH + "1.tar.gz" # update accordingly as per line 17
+        localpath = settings.FOLDER_PATH + "1.tar.gz" # update accordingly as per line 40
         blob.download_to_filename(localpath)
 
         # unzip process
@@ -28,6 +55,7 @@ def download_unzip(download_path, gcs_object_path):
     except Exception as e:
         print(e)
 
+# [{"a":1, "b":2},{"a":3, "b":2},{"a":5, "b":7}] --> will return highest key, value i.e (b, 7)
 def get_max_from_list_of_dict(list_of_dict):
     if len(list_of_dict) < 1:
         return
@@ -39,5 +67,7 @@ def get_max_from_list_of_dict(list_of_dict):
         filter_dict[k[v.index(max_v)]] = max_v
     vals = list(filter_dict.values())
     keys = list(filter_dict.keys())
-    return keys[vals.index(max(vals))], max(vals)
+    max_v = max(vals)
+    return keys[vals.index(max_v)], max_v
+
 
