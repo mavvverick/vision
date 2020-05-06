@@ -31,7 +31,6 @@ def get_proxy_loop():
     loop = asyncio.new_event_loop()
     proxy = loop.run_until_complete(task_manager())
     loop.close()
-    print("************")
     return proxy
 
 

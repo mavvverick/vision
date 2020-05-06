@@ -9,13 +9,13 @@ import settings
 from tensor_utils import img_to_array
 
 _IMAGE_SIZE = 299
-SERVER_URL = 'http://localhost:8501/v1/models/nsfw:predict'
+SERVER_URL = settings.HOST + '/v1/models/nsfw:predict'
 _LABEL_MAP = {0: 'drawings', 1: 'hentai', 2: 'neutral', 3: 'porn', 4: 'sexy'}
 
 
 def load_image(folder_path):
     files = [f for f in glob.glob(
-        folder_path + "/**/*.jpg", recursive=True)[:5]]
+        folder_path + "/**/*.jpg", recursive=True)[:1]]
     input_list = []
 
     for image_path in files:
@@ -51,6 +51,7 @@ def predict(images_data_list):
         return predict_result_map
     else:
         return data
+
 
 async def http(post_id):
     # folder_path = settings.FOLDER_PATH + post_id

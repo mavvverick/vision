@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='dense',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x0b\x64\x65nse.proto\x12\x05\x64\x65nse\"\x1b\n\tImageData\x12\x0e\n\x06postId\x18\x01 \x01(\t\"*\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\r\n\x05\x65rror\x18\x02 \x01(\t2\xac\x01\n\x07Predict\x12\x33\n\x0cpredict_nsfw\x12\x10.dense.ImageData\x1a\x0f.dense.Response\"\x00\x12\x33\n\x0cpredict_logo\x12\x10.dense.ImageData\x1a\x0f.dense.Response\"\x00\x12\x37\n\x10predict_pipeline\x12\x10.dense.ImageData\x1a\x0f.dense.Response\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x0b\x64\x65nse.proto\x12\x05\x64\x65nse\"\x1b\n\tImageData\x12\x0e\n\x06postId\x18\x01 \x01(\t\":\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12\x0e\n\x06isNext\x18\x03 \x01(\x08\x32\xac\x01\n\x07Predict\x12\x33\n\x0cpredict_nsfw\x12\x10.dense.ImageData\x1a\x0f.dense.Response\"\x00\x12\x33\n\x0cpredict_logo\x12\x10.dense.ImageData\x1a\x0f.dense.Response\"\x00\x12\x37\n\x10predict_pipeline\x12\x10.dense.ImageData\x1a\x0f.dense.Response\"\x00\x62\x06proto3'
 )
 
 
@@ -76,6 +76,13 @@ _RESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='isNext', full_name='dense.Response.isNext', index=2,
+      number=3, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -89,7 +96,7 @@ _RESPONSE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=51,
-  serialized_end=93,
+  serialized_end=109,
 )
 
 DESCRIPTOR.message_types_by_name['ImageData'] = _IMAGEDATA
@@ -118,8 +125,8 @@ _PREDICT = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=96,
-  serialized_end=268,
+  serialized_start=112,
+  serialized_end=284,
   methods=[
   _descriptor.MethodDescriptor(
     name='predict_nsfw',

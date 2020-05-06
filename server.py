@@ -34,17 +34,22 @@ class DenseServicer(dense_pb2_grpc.PredictServicer):
     def predict_pipeline(self, request, context):
         post_id = request.postId
         folder_path = settings.FOLDER_PATH + post_id
-        try :
+        try:
             download_unzip(folder_path, post_id)
         except Exception as e:
             print(e)
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        proxy = loop.run_until_complete(task_manager(post_id))
-        loop.close()
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            proxy = loop.run_until_complete(task_manager(post_id))
+            loop.close()
+        except Exception as e:
+            print(e)
         print_thread(post_id)
         res = json.dumps(proxy, ensure_ascii=False).encode('utf-8')
-        return dense_pb2.Response(message=res)
+        # TODO catch all err and return dense_pb2.Response(message="error message", error="error")
+        return dense_pb2.Response(message=res, isNext=True)
+
 
 def print_thread(post_id):
     print("current_thread: {}, post: {}".format(
