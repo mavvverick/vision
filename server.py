@@ -12,6 +12,9 @@ from common import download_unzip, get_max_from_list_of_dict, GCSClient
 import settings
 import json
 
+_ONE_DAY_IN_SECONDS = 60 * 60 * 24
+
+
 # https://github.com/comzyh/python-grpc-async-server-example/blob/master/server.py
 # python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. dense.proto
 
@@ -91,19 +94,24 @@ async def task_manager(post_id):
         tasks = unfinished
     return out
 
-# create a gRPC server
-server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
-dense_pb2_grpc.add_PredictServicer_to_server(
-    DenseServicer(), server)
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(
+        max_workers=settings.MAX_WORKERS))
+    dense_pb2_grpc.add_PredictServicer_to_server(
+        DenseServicer(), server)
+    print('Starting server. Listening on port 50051.')
+    server.add_insecure_port('[::]:50051')
+    server.start()
 
-# listen on port 50051
-print('Starting server. Listening on port 50051.')
-server.add_insecure_port('[::]:50051')
-server.start()
+    # gRPC starts a new thread to service requests. Just make the main thread
+    # sleep
+    try:
+        while True:
+            time.sleep(_ONE_DAY_IN_SECONDS)
+    except KeyboardInterrupt:
+        server.stop(grace=0)
 
-try:
-    while True:
-        time.sleep(86400)
-except KeyboardInterrupt:
-    server.stop(0)
+
+if __name__ == '__main__':
+    serve()

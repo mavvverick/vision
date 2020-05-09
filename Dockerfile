@@ -1,4 +1,4 @@
-FROM python:3.8.2-alpine3.11
+FROM python:3.8.2-alpine3.11 as builder
 MAINTAINER Paritosh Gupta <pg@totalitycorp.com>
 
 RUN apk add --update --no-cache \
@@ -25,9 +25,35 @@ ENV PATH /env/bin:$PATH
 
 COPY requirements.txt /app/
 RUN pip install --requirement /app/requirements.txt
+# COPY . /app/
+# EXPOSE 50051
+# ENTRYPOINT []
+# CMD ["python", "/app/server.py"]
+
+
+### FINAL DOCKER
+FROM python:3.8.2-alpine3.11
+MAINTAINER Paritosh Gupta <pg@totalitycorp.com>
+
+RUN apk --no-cache --update add libstdc++ \
+    zlib-dev \
+    libjpeg-turbo-dev \
+    && rm -Rf /var/cache/apk/*
+
+RUN \
+  pip install --upgrade pip && \
+  pip install --upgrade virtualenv 
+
+
+COPY --from=builder /env /env
+ENV PATH /env/bin:$PATH
+
 COPY . /app/
 
-EXPOSE 50051
-ENTRYPOINT []
+RUN ls  /env
+RUN ls  /app
 
+EXPOSE 50051
 CMD ["python", "/app/server.py"]
+
+#docker run -d --name vision  --env-file=.env -p 50051:50051 asia.gcr.io/chrome-weft-229408/vision:v1
