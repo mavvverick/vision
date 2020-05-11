@@ -45,7 +45,7 @@ async def download_unzip(client, download_path, gcs_object_path):
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(object_path)
 
-        localpath = settings.FOLDER_PATH + "1.tar.gz" # update accordingly as per line 40
+        localpath = settings.FOLDER_PATH + "1.tar.gz" # update accordingly as per line 44
         blob.download_to_filename(localpath)
 
         # unzip process

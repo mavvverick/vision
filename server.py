@@ -47,13 +47,15 @@ class DenseServicer(dense_pb2_grpc.PredictServicer):
         folder_path = settings.FOLDER_PATH + post_id
         try:
             asyncio.run(download_unzip(self.gcs_client, folder_path, post_id))
+            is_next = True
             proxy = asyncio.run(task_manager(post_id))
+            if proxy.get("nsfw") != "False" : #Content is NSFW. Update isNext flag
+                isNext=False
             res = json.dumps(proxy, ensure_ascii=False).encode('utf-8')
             # TODO catch all err and return dense_pb2.Response(message="error message", error="error")
-            return dense_pb2.Response(message=res, isNext=True)
-        except Exception as e:
-            print(e)
-
+            return dense_pb2.Response(message=res, isNext=isNext)
+        except Exception as ex:
+            return dense_pb2.Response(message=str(type(ex).__name__), error=str(ex))
 
 def print_thread(post_id):
     print("current_thread: {}, post: {}".format(
