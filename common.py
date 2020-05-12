@@ -1,6 +1,6 @@
 import settings
-from google.cloud import storage
-import tarfile
+from google.cloud import storage, exceptions 
+import gzip
 import tempfile
 
 # create singleton
@@ -41,19 +41,21 @@ class GCSClient(object):
 async def download_unzip(client, download_path, gcs_object_path):
     try:
         bucket_name = settings.BUCKET_NAME
-        object_path = gcs_object_path+"/raw/1.tar.gz" # need to update the gcs object path (refer from input url)
+        object_path = gcs_object_path+"/frames.gzip"
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(object_path)
 
-        localpath = settings.FOLDER_PATH + "1.tar.gz" # update accordingly as per line 44
+        localpath = settings.FOLDER_PATH + gcs_object_path + "-frames.gzip"
         blob.download_to_filename(localpath)
 
         # unzip process
         tar = tarfile.open(localpath, "r:gz")
         tar.extractall(path=download_path)
         tar.close()
+    except exceptions.NotFound:
+        raise exceptions.NotFound("requested file doesn't exist")
     except Exception as e:
-        print(e)
+        raise e
 
 # [{"a":1, "b":2},{"a":3, "b":2},{"a":5, "b":7}] --> will return highest key, value i.e (b, 7)
 def get_max_from_list_of_dict(list_of_dict):

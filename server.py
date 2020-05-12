@@ -52,7 +52,6 @@ class DenseServicer(dense_pb2_grpc.PredictServicer):
             if proxy.get("nsfw") != "False" : #Content is NSFW. Update isNext flag
                 isNext=False
             res = json.dumps(proxy, ensure_ascii=False).encode('utf-8')
-            # TODO catch all err and return dense_pb2.Response(message="error message", error="error")
             return dense_pb2.Response(message=res, isNext=isNext)
         except Exception as ex:
             return dense_pb2.Response(message=str(type(ex).__name__), error=str(ex))

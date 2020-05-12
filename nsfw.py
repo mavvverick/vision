@@ -14,8 +14,8 @@ _LABEL_MAP = {0: 'drawings', 1: 'hentai', 2: 'neutral', 3: 'porn', 4: 'sexy'}
 
 
 def load_image(folder_path):
-    files = [f for f in glob.glob(
-        folder_path + "/**/*.jpg", recursive=True)[:1]]
+    files = [f for f in sorted(glob.glob(
+        folder_path + "/**/*.jpg", recursive=True))[0:9:2]] #select 5 alternate frames from first 10 frames
     input_list = []
 
     for image_path in files:
