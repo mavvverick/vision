@@ -60,11 +60,13 @@ async def download_unzip(client, download_path, gcs_object_path):
                     shutil.copyfileobj(f_in, f_out)
             except:
                 pass
-        os.remove(localpath)
     except exceptions.NotFound:
         raise exceptions.NotFound("no zip found")
     except Exception as e:
         raise e
+    finally:
+        if os.path.exists(localpath):
+            os.remove(localpath)
 
 # [{"a":1, "b":2},{"a":3, "b":2},{"a":5, "b":7}] --> will return highest key, value i.e (b, 7)
 def get_max_from_list_of_dict(list_of_dict):
@@ -72,6 +74,7 @@ def get_max_from_list_of_dict(list_of_dict):
         return
     filter_dict = list_of_dict[0]
     for d in list_of_dict:
+        d.pop('neutral', None)
         v = list(d.values())
         max_v = max(v)
         k = list(d.keys())

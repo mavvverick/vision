@@ -83,13 +83,13 @@ async def task_manager(post_id):
                 #     await task.cancel()
                 if x.get_name() == "nsfw":
                     key, val = get_max_from_list_of_dict(result)
-                    if key != "neutral" and val > 0.5:
+                    if val > 0.6:
                         out[x.get_name()] = "True|{key}|{value}".format(key=key,value=val)
                     else:
                         out[x.get_name()] = "False"
                 elif x.get_name() == "logo":
                     key, val = get_max_from_list_of_dict(result)
-                    if key != "neutral" and val > 0.5:
+                    if val > 0.6:
                         out[x.get_name()] = "True|{key}".format(key=key)
                     else:
                         out[x.get_name()] = "False"
