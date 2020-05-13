@@ -54,8 +54,8 @@ def predict(images_data_list):
 
 
 async def http(post_id):
-    # folder_path = settings.FOLDER_PATH + post_id
+    folder_path = settings.FOLDER_PATH + post_id
     # await download_unzip(folder_path, post_id)
-    images_data_list = load_image(settings.FOLDER_PATH)
+    images_data_list = load_image(folder_path)
     result = predict(images_data_list)
     return result

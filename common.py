@@ -1,7 +1,7 @@
 import settings
 from google.cloud import storage, exceptions 
-import gzip
 import tempfile
+import os, zipfile, shutil
 
 # create singleton
 # ref -> https://medium.com/better-programming/singleton-in-python-5eaa66618e3d
@@ -41,19 +41,28 @@ class GCSClient(object):
 async def download_unzip(client, download_path, gcs_object_path):
     try:
         bucket_name = settings.BUCKET_NAME
-        object_path = gcs_object_path+"/frames.gzip"
+        object_path = gcs_object_path +"/frames.zip"
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(object_path)
 
-        localpath = settings.FOLDER_PATH + gcs_object_path + "-frames.gzip"
+        localpath = settings.FOLDER_PATH + gcs_object_path + "-frames.zip"
         blob.download_to_filename(localpath)
 
         # unzip process
-        tar = tarfile.open(localpath, "r:gz")
-        tar.extractall(path=download_path)
-        tar.close()
+        if not os.path.exists(download_path):
+            os.makedirs(download_path)
+        zf = zipfile.ZipFile(localpath)
+        for name in zf.namelist():
+            try:
+                f_in = zf.open(name)
+                fname = name.split("/")
+                with open(download_path+"/"+fname[2], 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+            except:
+                pass
+        os.remove(localpath)
     except exceptions.NotFound:
-        raise exceptions.NotFound("requested file doesn't exist")
+        raise exceptions.NotFound("no zip found")
     except Exception as e:
         raise e
 
@@ -61,12 +70,13 @@ async def download_unzip(client, download_path, gcs_object_path):
 def get_max_from_list_of_dict(list_of_dict):
     if len(list_of_dict) < 1:
         return
-    filter_dict = {}
+    filter_dict = list_of_dict[0]
     for d in list_of_dict:
         v = list(d.values())
         max_v = max(v)
         k = list(d.keys())
-        filter_dict[k[v.index(max_v)]] = max_v
+        if max_v > filter_dict[k[v.index(max_v)]]:
+            filter_dict[k[v.index(max_v)]] = max_v
     vals = list(filter_dict.values())
     keys = list(filter_dict.keys())
     max_v = max(vals)

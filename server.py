@@ -10,7 +10,7 @@ import asyncio
 from threading import current_thread
 from common import download_unzip, get_max_from_list_of_dict, GCSClient
 import settings
-import json
+import json, shutil
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
@@ -47,8 +47,9 @@ class DenseServicer(dense_pb2_grpc.PredictServicer):
         folder_path = settings.FOLDER_PATH + post_id
         try:
             asyncio.run(download_unzip(self.gcs_client, folder_path, post_id))
-            is_next = True
+            isNext = True
             proxy = asyncio.run(task_manager(post_id))
+            shutil.rmtree(folder_path)
             if proxy.get("nsfw") != "False" : #Content is NSFW. Update isNext flag
                 isNext=False
             res = json.dumps(proxy, ensure_ascii=False).encode('utf-8')
@@ -82,13 +83,13 @@ async def task_manager(post_id):
                 #     await task.cancel()
                 if x.get_name() == "nsfw":
                     key, val = get_max_from_list_of_dict(result)
-                    if val > 0.5:
-                        out[x.get_name()] = "True|{key}".format(key=key)
+                    if key != "neutral" and val > 0.5:
+                        out[x.get_name()] = "True|{key}|{value}".format(key=key,value=val)
                     else:
                         out[x.get_name()] = "False"
                 elif x.get_name() == "logo":
                     key, val = get_max_from_list_of_dict(result)
-                    if val > 0.5:
+                    if key != "neutral" and val > 0.5:
                         out[x.get_name()] = "True|{key}".format(key=key)
                     else:
                         out[x.get_name()] = "False"
